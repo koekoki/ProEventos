@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ProEvento.API.Data;
 using ProEvento.API.Model;
 
 namespace ProEvento.API.Controllers
@@ -13,46 +14,31 @@ namespace ProEvento.API.Controllers
     [Route("api/[controller]")]
     public class EventoController : ControllerBase
     {
-        public IEnumerable<Evento> _eventos = new Evento[]{
-            
-            new Evento(){
-                eventoId = 1,
-                tema = "Angular",
-                local = "escola",
-                lote = "100",
-                qtdPessoas = 250,
-                dataEvento = DateTime.Now.AddDays(2).ToString("dd/MM/yyyy")
-            },
-            new Evento(){
-                eventoId = 2,
-                tema = "ASPNET",
-                local = "escola",
-                lote = "100",
-                qtdPessoas = 250,
-                dataEvento = DateTime.Now.AddDays(3).ToString("dd/MM/yyyy")
-            }        
-        };
-        public EventoController()
+        private readonly DataContext _context;
+        public EventoController(DataContext context)
         {
-       
+            _context = context;
+
         }
 
         [HttpGet]
         public IEnumerable<Evento> Get()
         {
-            return _eventos;
+            return _context.Eventos;
         }
 
-         [HttpGet("{id}")]
-         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-         [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById(int id)
         {
-            IEnumerable<Evento> eventoEncontrado =  _eventos.Where(evento => evento.eventoId.Equals(id));
-            if( eventoEncontrado.Count() == 0){
+            Evento eventoEncontrado = _context.Eventos.FirstOrDefault(evento => evento.eventoId.Equals(id));
+            if (eventoEncontrado == null)
+            {
                 return BadRequest("Evento não encontrado");
             }
-            else{
+            else
+            {
                 return Ok(eventoEncontrado);
             }
         }
@@ -63,18 +49,18 @@ namespace ProEvento.API.Controllers
             return "POST";
         }
 
-        
+
         [HttpPut("{id}")]
         public string Put(int id)
         {
             return $"Put = {id}";
         }
 
-        
+
         [HttpDelete("{id}")]
         public string Delete(int id)
         {
-            return $"delete = {id}"; 
+            return $"delete = {id}";
         }
     }
 }

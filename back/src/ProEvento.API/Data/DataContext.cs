@@ -1,7 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using ProEvento.API.Model;
+
 namespace ProEvento.API.Data
 {
-    public class DataContext
+    public class DataContext : DbContext
     {
-         
+        public DataContext (DbContextOptions<DataContext> options) : base(options){ }
+         public DbSet<Evento> Eventos{get; set;}
     }
 }
